@@ -61,6 +61,16 @@ elif robot_type == "WF_TRON1A":
     from legged_gym.envs.wheelfoot_flat.wheelfoot_flat_config import BipedCfgWF, BipedCfgPPOWF
     task_registry.register("pointfoot_flat", BipedWF, BipedCfgWF(), BipedCfgPPOWF())
 
+elif robot_type == "Tita":
+    from legged_gym.envs.tita_flat.tita_flat import BipedTita
+    from legged_gym.envs.tita_flat.tita_flat_config import BipedCfgTita, BipedCfgPPOTita
+    task_registry.register("pointfoot_flat", BipedTita, BipedCfgTita(), BipedCfgPPOTita())
+
+elif robot_type == "WL":
+    from legged_gym.envs.wheellegged_flat.wheellegged_flat import BipedWL
+    from legged_gym.envs.wheellegged_flat.wheellegged_flat_config import BipedCfgWL, BipedCfgPPOWL
+    task_registry.register("pointfoot_flat", BipedWL, BipedCfgWL(), BipedCfgPPOWL())
+
 else:
     print("\033[1m\033[31mError: Input ROBOT_TYPE={}".format(robot_type), 
         "is not among valid robot types PF_P441A, PF_P441B, PF_P441C, PF_P441C2, PF_TRON1A, WF_TRON1A and SF_TRON1A.\033[0m")

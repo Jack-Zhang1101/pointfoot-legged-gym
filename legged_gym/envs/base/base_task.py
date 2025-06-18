@@ -1191,6 +1191,7 @@ class BaseTask:
 
         if self.cfg.env.dof_vel_use_pos_diff:
             self.dof_vel = self.dof_pos_dot
+          
 
         self.last_dof_pos[:] = self.dof_pos[:]
         
