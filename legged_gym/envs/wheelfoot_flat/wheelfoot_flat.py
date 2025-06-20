@@ -438,4 +438,5 @@ class BipedWF(BaseTask):
     def _reward_base_height(self):
         # Penalize base height away from target
         base_height = torch.mean(self.root_states[:, 2].unsqueeze(1) - self.measured_heights, dim=1)
+
         return torch.abs(base_height - self.cfg.rewards.base_height_target)

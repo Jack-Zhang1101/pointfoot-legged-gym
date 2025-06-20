@@ -45,7 +45,7 @@ class BipedCfgWF(BaseConfig):
         fail_to_terminal_time_s = 0.5
 
     class terrain:
-        mesh_type = "plane"  # "heightfield" # none, plane, heightfield or trimesh
+        mesh_type = "trimesh"  # "heightfield" # none, plane, heightfield or trimesh
         horizontal_scale = 0.1  # [m]
         vertical_scale = 0.005  # [m]
         border_size = 25  # [m]
@@ -87,7 +87,7 @@ class BipedCfgWF(BaseConfig):
         )
 
     class commands:
-        curriculum = False
+        curriculum = True
         smooth_max_lin_vel_x = 2.0
         smooth_max_lin_vel_y = 1.0
         non_smooth_max_lin_vel_x = 1.0
@@ -249,7 +249,7 @@ class BipedCfgWF(BaseConfig):
             collision = -50
             action_smooth = -0.03
             orientation = -12.0
-            feet_distance = -100
+            feet_distance = -50 #-100
             base_height = -20
 
         only_positive_rewards = False  # if true negative total rewards are clipped at zero (avoids early termination problems)

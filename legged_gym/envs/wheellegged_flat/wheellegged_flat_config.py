@@ -141,10 +141,10 @@ class BipedCfgWL(BaseConfig):
         #pd 30 1.5 20 0.5 BEST
         control_type = "P"
         stiffness = {
-            "LF_Joint": 20.0,
+            "LF_Joint": 15.0,
             "LFP_Joint": 20.0,
             "LW_Joint": 0.0,
-            "RF_Joint": 20.0,
+            "RF_Joint": 15.0,
             "RFP_Joint": 20.0,
             "RW_Joint": 0.0,
 
@@ -228,26 +228,26 @@ class BipedCfgWL(BaseConfig):
 
             # tracking related rewards
             tracking_lin_vel = 4.0
-            tracking_ang_vel = 2.0
+            tracking_ang_vel = 4.0
             tracking_lin_vel_pb = 1.0
             tracking_ang_vel_pb = 0.2
 
             # regulation related rewards
             nominal_foot_position = 4.0
-            leg_symmetry = 0.5
-            same_foot_x_position = -50 
+            leg_symmetry = 0.5 #0.5
+            same_foot_x_position = -10  #-50
             same_foot_z_position = -100
-            lin_vel_z = -0.3
-            ang_vel_xy = -0.3
+            lin_vel_z = -0.3 
+            ang_vel_xy = -0.1 #-0.3
             torques = -0.00016
             dof_acc = -1.5e-7
-            action_rate = -0.03
+            action_rate = -0.01 #-0.03
             dof_pos_limits = -2.0
             collision = -50
-            action_smooth = -0.03
-            orientation = -24.0 #-12
+            action_smooth = -0.01 #-0.03
+            orientation = -12.0 #-12
             # feet_distance = -100
-            base_height = -40 #-20
+            base_height = -20 #-20
 
         only_positive_rewards = False  # if true negative total rewards are clipped at zero (avoids early termination problems)
         clip_reward = 100
@@ -264,8 +264,8 @@ class BipedCfgWL(BaseConfig):
         )
         soft_dof_vel_limit = 1.0
         soft_torque_limit = 0.8
-        base_height_target = 0.24
-        feet_height_target = 0.025
+        base_height_target = 0.23
+        feet_height_target = 0.03
         # min_feet_distance = 0.3
         # max_feet_distance = 0.35
         max_contact_force = 50.0  # forces above this value are penalized
