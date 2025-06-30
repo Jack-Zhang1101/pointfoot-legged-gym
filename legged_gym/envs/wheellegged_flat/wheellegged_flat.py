@@ -440,3 +440,15 @@ class BipedWL(BaseTask):
         # Penalize base height away from target
         base_height = torch.mean(self.root_states[:, 2].unsqueeze(1) - self.measured_heights, dim=1)
         return torch.abs(base_height - self.cfg.rewards.base_height_target)
+    
+    def _reward_wheel_adjustment(self):
+        # 鼓励使用轮子的滑动克服前后的倾斜，奖励轮速和倾斜方向一致的情况，并要求轮速方向也一致
+        incline_x = self.projected_gravity[:, 0]  # 获取前后倾斜角度
+        # mean velocity
+        wheel_x_mean = (self.foot_velocities[:, 0, 0] + self.foot_velocities[:, 1, 0]) / 2
+        # 两边轮速不一致的情况，不给奖励
+        wheel_x_invalid = (self.foot_velocities[:, 0, 0] * self.foot_velocities[:, 1, 0]) < 0
+        wheel_x_mean[wheel_x_invalid] = 0.0
+        wheel_x_mean = wheel_x_mean.reshape(-1)
+        reward = incline_x * wheel_x_mean > 0
+        return reward.float()

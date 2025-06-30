@@ -141,10 +141,10 @@ class BipedCfgWL(BaseConfig):
         #pd 30 1.5 20 0.5 BEST
         control_type = "P"
         stiffness = {
-            "LF_Joint": 15.0,
+            "LF_Joint": 20.0,
             "LFP_Joint": 20.0,
             "LW_Joint": 0.0,
-            "RF_Joint": 15.0,
+            "RF_Joint": 20.0,
             "RFP_Joint": 20.0,
             "RW_Joint": 0.0,
 
@@ -167,8 +167,8 @@ class BipedCfgWL(BaseConfig):
         name = "wheellegged_flat"
         foot_name = "W_Link"
         foot_radius = 0.07
-        penalize_contacts_on = ["FP_Link"]
-        terminate_after_contacts_on = ["F_Link","base"]
+        penalize_contacts_on = ["FP_Link","F_Link"]
+        terminate_after_contacts_on = ["F_Link","base","FP_Link"]
         # penalize_contacts_on = ["FP_Link"]
         # terminate_after_contacts_on = ["base","F_Link"]
         disable_gravity = False
@@ -184,8 +184,8 @@ class BipedCfgWL(BaseConfig):
         density = 0.001
         angular_damping = 0.0
         linear_damping = 0.0
-        max_angular_velocity = 1000.0
-        max_linear_velocity = 1000.0
+        max_angular_velocity = 100.0
+        max_linear_velocity = 100.0
         armature = 0.0
         thickness = 0.01
 
@@ -195,13 +195,13 @@ class BipedCfgWL(BaseConfig):
         randomize_restitution = True
         restitution_range = [0.0, 1.0]
         randomize_base_mass = True
-        added_mass_range = [-0.25, 0.25]
+        added_mass_range = [-0.5, 0.5]
         randomize_base_com = True
         rand_com_vec = [0.01, 0.01, 0.01]
         randomize_inertia = True
         randomize_inertia_range = [0.8, 1.2]
         push_robots = True
-        push_interval_s = 3
+        push_interval_s = 5
         max_push_vel_xy = 0.5
         rand_force = False
         force_resampling_time_s = 15
@@ -230,7 +230,7 @@ class BipedCfgWL(BaseConfig):
             tracking_lin_vel = 4.0
             tracking_ang_vel = 4.0
             tracking_lin_vel_pb = 1.0
-            tracking_ang_vel_pb = 0.2
+            tracking_ang_vel_pb = 0.5
 
             # regulation related rewards
             nominal_foot_position = 4.0
@@ -238,17 +238,17 @@ class BipedCfgWL(BaseConfig):
             same_foot_x_position = -10  #-50
             same_foot_z_position = -100
             lin_vel_z = -0.3 
-            ang_vel_xy = -0.1 #-0.3
+            ang_vel_xy = -0.2 #-0.3
             torques = -0.00016
             dof_acc = -1.5e-7
-            action_rate = -0.01 #-0.03
+            action_rate = -0.02 #-0.03
             dof_pos_limits = -2.0
             collision = -50
-            action_smooth = -0.01 #-0.03
+            action_smooth = -0.02 #-0.03
             orientation = -12.0 #-12
             # feet_distance = -100
             base_height = -20 #-20
-
+            wheel_adjustment = 2 #1
         only_positive_rewards = False  # if true negative total rewards are clipped at zero (avoids early termination problems)
         clip_reward = 100
         clip_single_reward = 5
@@ -291,7 +291,7 @@ class BipedCfgWL(BaseConfig):
 
     class noise:
         add_noise = True
-        noise_level = 0.25  # scales other values 1.5
+        noise_level = 0.5  # scales other values 1.5
 
         class noise_scales:
             dof_pos = 0.01
@@ -375,13 +375,13 @@ class BipedCfgPPOWL(BaseConfig):
         policy_class_name = "ActorCritic"
         algorithm_class_name = "PPO"
         num_steps_per_env = 24  # per iteration
-        max_iterations = 8000  # number of policy updates
+        max_iterations = 20000  # number of policy updates
 
         # logging
         logger = "tensorboard"
         exptid = ""
         wandb_project = "legged_gym_WL"
-        save_interval = 500  # check for potential saves every this many iterations
+        save_interval = 2000  # check for potential saves every this many iterations
         experiment_name = "WL"
         run_name = ""
         # load and resume

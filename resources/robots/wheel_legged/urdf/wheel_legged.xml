@@ -1,0 +1,108 @@
+<mujoco model="wheel_legged">
+  <default>
+    <default class="robot">
+      <default class="motor">
+        <joint />
+        <motor />
+      </default>
+      <default class="visual">
+        <geom material="visualgeom" contype="0" conaffinity="0" group="2" />
+      </default>
+      <default class="collision">
+        <geom material="collision_material" condim="3" contype="0" conaffinity="1" priority="1" group="1" solref="0.005 1" friction="1 0.01 0.01" />
+        <equality solimp="0.99 0.999 1e-05" solref="0.005 1" />
+      </default>
+    </default>
+  </default>
+
+  <compiler angle="radian" />
+
+  <asset>
+    <material name="" rgba="0.29804 0.29804 0.29804 1" />
+    <material name="default_material" rgba="0.7 0.7 0.7 1" />
+    <material name="collision_material" rgba="1.0 0.28 0.1 0.9" />
+    <mesh name="base_link.STL" file="../meshes/base_link.STL" />
+    <mesh name="LF_Link.STL" file="../meshes/LF_Link.STL" />
+    <mesh name="LFP_Link.STL" file="../meshes/LFP_Link.STL" />
+    <mesh name="LW_Link.STL" file="../meshes/LW_Link.STL" />
+    <mesh name="RF_Link.STL" file="../meshes/RF_Link.STL" />
+    <mesh name="RFP_Link.STL" file="../meshes/RFP_Link.STL" />
+    <mesh name="RW_Link.STL" file="../meshes/RW_Link.STL" />
+  </asset>
+
+  <worldbody>
+    <body name="world" pos="0.00000000 0.00000000 0.16803410" quat="1 0 0 0" childclass="robot">
+      <freejoint name="floating_base" />
+      <body name="base_link" pos="0 0 0" quat="1 0 0 0">
+        <inertial pos="-0.00064749 -8.914E-05 0.0086246" quat="1.0 0.0 0.0 0.0" mass="4.5068" diaginertia="0.0050266 0.0054947 0.0061634" />
+        <geom name="base_link_collision" pos="0 0 0" quat="1.0 0.0 0.0 0.0" type="mesh" mesh="base_link.STL" class="collision" />
+        <geom name="base_link_visual" pos="0 0 0" quat="1.0 0.0 0.0 0.0" material="" type="mesh" mesh="base_link.STL" class="visual" />
+        <body name="LF_Link" pos="0 0.132500000000022 0" quat="1.0 0.0 0.0 0.0">
+          <joint name="LF_Joint" type="hinge" ref="0.0" class="motor" range="-1.57 3.14" axis="0 -1 0" />
+          <inertial pos="0.089365 -0.00018073 0.0029646" quat="1.0 0.0 0.0 0.0" mass="0.17934" diaginertia="1.9784e-05 7.9217e-05 7.1768e-05" />
+          <geom name="LF_Link_collision" pos="0 0 0" quat="1.0 0.0 0.0 0.0" type="mesh" mesh="LF_Link.STL" class="collision" />
+          <geom name="LF_Link_visual" pos="0 0 0" quat="1.0 0.0 0.0 0.0" material="" type="mesh" mesh="LF_Link.STL" class="visual" />
+          <body name="LFP_Link" pos="0.142000004507913 0 0" quat="1.0 0.0 0.0 0.0">
+            <joint name="LFP_Joint" type="hinge" ref="0.0" class="motor" range="-1.134 0.314" axis="0 1 0" />
+            <inertial pos="-0.12177 0.0042175 -0.14582" quat="1.0 0.0 0.0 0.0" mass="0.95838" diaginertia="0.00069686 0.0012011 0.00065048" />
+            <geom name="LFP_Link_collision" pos="0 0 0" quat="1.0 0.0 0.0 0.0" type="mesh" mesh="LFP_Link.STL" class="collision" />
+            <geom name="LFP_Link_visual" pos="0 0 0" quat="1.0 0.0 0.0 0.0" material="" type="mesh" mesh="LFP_Link.STL" class="visual" />
+            <body name="LW_Link" pos="-0.142000004507854 0 -0.168034099728752" quat="1.0 0.0 0.0 0.0">
+              <joint name="LW_Joint" type="hinge" ref="0.0" class="motor" range="-999999 999999" axis="0 -1 0" />
+              <inertial pos="-2.5931E-15 0.017841 1.3878E-16" quat="1.0 0.0 0.0 0.0" mass="0.3803" diaginertia="0.00056199 0.0010274 0.00056199" />
+              <geom name="LW_Link_collision" pos="0 0 0" quat="1.0 0.0 0.0 0.0" type="mesh" mesh="LW_Link.STL" class="collision" />
+              <geom name="LW_Link_visual" pos="0 0 0" quat="1.0 0.0 0.0 0.0" material="" type="mesh" mesh="LW_Link.STL" class="visual" />
+            </body>
+          </body>
+        </body>
+        <body name="RF_Link" pos="0 -0.132499999999983 0" quat="1.0 0.0 0.0 0.0">
+          <joint name="RF_Joint" type="hinge" ref="0.0" class="motor" range="-1.57 3.14" axis="0 -1 0" />
+          <inertial pos="0.089365 -7.144E-05 0.0029646" quat="1.0 0.0 0.0 0.0" mass="0.17934" diaginertia="1.9784e-05 7.9217e-05 7.1768e-05" />
+          <geom name="RF_Link_collision" pos="0 0 0" quat="1.0 0.0 0.0 0.0" type="mesh" mesh="RF_Link.STL" class="collision" />
+          <geom name="RF_Link_visual" pos="0 0 0" quat="1.0 0.0 0.0 0.0" material="" type="mesh" mesh="RF_Link.STL" class="visual" />
+          <body name="RFP_Link" pos="0.142000004507912 0 0" quat="1.0 0.0 0.0 0.0">
+            <joint name="RFP_Joint" type="hinge" ref="0.0" class="motor" range="-1.134 0.314" axis="0 1 0" />
+            <inertial pos="-0.12541 -0.0043984 -0.1498" quat="1.0 0.0 0.0 0.0" mass="0.95838" diaginertia="0.00064564 0.0011108 0.00061075" />
+            <geom name="RFP_Link_collision" pos="0 0 0" quat="1.0 0.0 0.0 0.0" type="mesh" mesh="RFP_Link.STL" class="collision" />
+            <geom name="RFP_Link_visual" pos="0 0 0" quat="1.0 0.0 0.0 0.0" material="" type="mesh" mesh="RFP_Link.STL" class="visual" />
+            <body name="RW_Link" pos="-0.142 0 -0.16803" quat="1.0 0.0 0.0 0.0">
+              <joint name="RW_Joint" type="hinge" ref="0.0" class="motor" range="-99999 99999" axis="0 -1 0" />
+              <inertial pos="5.6319E-15 -0.017841 4.0079E-14" quat="1.0 0.0 0.0 0.0" mass="0.3803" diaginertia="0.00056199 0.0010274 0.00056199" />
+              <geom name="RW_Link_collision" pos="0 0 0" quat="1.0 0.0 0.0 0.0" type="mesh" mesh="RW_Link.STL" class="collision" />
+              <geom name="RW_Link_visual" pos="0 0 0" quat="1.0 0.0 0.0 0.0" material="" type="mesh" mesh="RW_Link.STL" class="visual" />
+            </body>
+          </body>
+        </body>
+      </body>
+      <site name="world_site" pos="0 0 0" quat="1 0 0 0" />
+      <camera name="front_camera" mode="track" fovy="90.0" quat="4.329780281177467e-17 4.329780281177466e-17 0.7071067811865475 0.7071067811865476" pos="0.0 2.0 0.5" />
+      <camera name="side_camera" mode="track" fovy="90.0" quat="-0.5 -0.4999999999999999 0.5 0.5000000000000001" pos="-2.0 0.0 0.5" />
+    </body>
+  </worldbody>
+
+  <actuator>
+    <motor name="LF_Joint_ctrl" joint="LF_Joint" class="motor" />
+    <motor name="LFP_Joint_ctrl" joint="LFP_Joint" class="motor" />
+    <motor name="LW_Joint_ctrl" joint="LW_Joint" class="motor" />
+    <motor name="RF_Joint_ctrl" joint="RF_Joint" class="motor" />
+    <motor name="RFP_Joint_ctrl" joint="RFP_Joint" class="motor" />
+    <motor name="RW_Joint_ctrl" joint="RW_Joint" class="motor" />
+  </actuator>
+
+  <contact>
+    <exclude body1="base_link" body2="LF_Link" />
+    <exclude body1="LF_Link" body2="LFP_Link" />
+    <exclude body1="LFP_Link" body2="LW_Link" />
+    <exclude body1="base_link" body2="RF_Link" />
+    <exclude body1="RF_Link" body2="RFP_Link" />
+    <exclude body1="RFP_Link" body2="RW_Link" />
+  </contact>
+
+  <sensor>
+    <framepos name="world_site_pos" objtype="site" objname="world_site" />
+    <framequat name="world_site_quat" objtype="site" objname="world_site" />
+    <framelinvel name="world_site_linvel" objtype="site" objname="world_site" />
+    <frameangvel name="world_site_angvel" objtype="site" objname="world_site" />
+    <velocimeter name="world_site_vel" site="world_site" />
+  </sensor>
+</mujoco>

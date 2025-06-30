@@ -23,7 +23,7 @@
 ### Usage ###
 1. Train(take pointfoot for example):
 
-    ```export ROBOT_TYPE=PF_TRON1A```
+    ```export ROBOT_TYPE=WL```
 
     ```python legged_gym/scripts/train.py --task=pointfoot_flat --headless```
     -  To run on CPU add following arguments: `--sim_device=cpu`, `--rl_device=cpu` (sim on CPU and rl on GPU is possible).

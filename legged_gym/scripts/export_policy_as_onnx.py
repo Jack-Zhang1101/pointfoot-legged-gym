@@ -10,6 +10,29 @@ from legged_gym.algorithm.actor_critic import ActorCritic
 import numpy as np
 import torch
 import copy
+import torch.nn as nn
+
+class CombinedPolicy(nn.Module):
+    """组合策略网络，输入为[batch, 245]，前242为观测历史（11帧），后3为指令"""
+    def __init__(self, encoder, actor, obs_dim, obs_history_steps, command_dim):
+        super().__init__()
+        self.encoder = encoder
+        self.actor = actor
+        self.obs_dim = obs_dim
+        self.obs_history_steps = obs_history_steps
+        self.command_dim = command_dim
+        self.history_dim = obs_dim * obs_history_steps
+
+    def forward(self, input_tensor):
+        # input_tensor: [B, 245]，前242为观测历史（11帧），后3为指令
+        # encoder只吃前10帧（220维），obs为最后1帧（22维）
+        obs_history = input_tensor[:, :self.obs_dim * (self.obs_history_steps - 1)]  # 10帧
+        obs = input_tensor[:, self.obs_dim * (self.obs_history_steps - 1):self.obs_dim * self.obs_history_steps]  # 第11帧
+        commands = input_tensor[:, self.obs_dim * self.obs_history_steps:]
+        latent = self.encoder(obs_history)
+        x = torch.cat([latent, obs, commands], dim=-1)
+        actions = self.actor(x)
+        return actions
 
 def export_policy_as_onnx(args, robot_type):
     env_cfg, train_cfg = task_registry.get_cfgs(name=args.task)
@@ -18,6 +41,7 @@ def export_policy_as_onnx(args, robot_type):
     loaded_dict = torch.load(resume_path)
     export_path = os.path.join(LEGGED_GYM_ROOT_DIR, 'logs', args.task, train_cfg.runner.experiment_name, 'exported', 'policies')
     os.makedirs(export_path, exist_ok=True)
+    
     # encoder
     encoder_class = eval(train_cfg.runner.encoder_class_name)
     encoder = encoder_class(**class_to_dict(train_cfg)[train_cfg.runner.encoder_class_name]).to(args.rl_device)
@@ -72,6 +96,31 @@ def export_policy_as_onnx(args, robot_type):
     )
     print("Exported policy as onnx script to: ", policy_path)
 
+    # 导出合并的模型
+    print("\n开始导出合并的ONNX模型...")
+    obs_dim = env_cfg.env.num_observations
+    obs_history_steps = env_cfg.env.obs_history_length + 1  # 11步
+    command_dim = env_cfg.commands.num_commands
+    total_dim = obs_dim * obs_history_steps + command_dim  # 245
+    print(f"总输入维度: {total_dim}")
+    encoder_cpu = copy.deepcopy(encoder).to("cpu")
+    actor_cpu = copy.deepcopy(actor_critic.actor).to("cpu")
+    combined = CombinedPolicy(encoder_cpu, actor_cpu, obs_dim, obs_history_steps, command_dim)
+    combined.eval()
+    combined_path = os.path.join(export_path, "combined_policy.onnx")
+    dummy_input = torch.randn(1, total_dim)
+    torch.onnx.export(
+        combined,
+        dummy_input,
+        combined_path,
+        input_names=["input"],
+        output_names=["actions"],
+        opset_version=13,
+        verbose=True,
+        export_params=True,
+    )
+    print("Exported combined policy as onnx script to: ", combined_path)
+    print("合并模型导出完成！")
 
 if __name__ == '__main__':
     
@@ -81,7 +130,7 @@ if __name__ == '__main__':
         print("\033[1m\033[31mError: Please set the ROBOT_TYPE using 'export ROBOT_TYPE=<robot_type>'.\033[0m")
         sys.exit(1)
 
-    if not robot_type in ["PF_TRON1A", "PF_P441A", "PF_P441B", "PF_P441C", "PF_P441C2", "SF_TRON1A", "WF_TRON1A"]:
+    if not robot_type in ["PF_TRON1A", "PF_P441A", "PF_P441B", "PF_P441C", "PF_P441C2", "SF_TRON1A", "WF_TRON1A","WL"]:
         print("\033[1m\033[31mError: Input ROBOT_TYPE={}".format(robot_type), 
         "is not among valid robot types WF_TRON1A, SF_TRON1A, PF_TRON1A, PF_P441A, PF_P441B, PF_P441C, PF_P441C2.\033[0m")
         sys.exit(1)
