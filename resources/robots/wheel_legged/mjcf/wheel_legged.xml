@@ -1,0 +1,137 @@
+<mujoco model="wheel_legged">
+  <compiler angle="radian" meshdir="../meshes/"/>
+  <option timestep='0.001' iterations='50' solver='PGS' gravity='0 0 -9.81'>
+  </option>
+  <size njmax="500" nconmax="100" />
+
+  <default>
+    <default class="wheel">
+      <joint damping="0.1" armature="0.01"/>
+      <default class="visual">
+        <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.75294 0.75294 0.75294 1"/>
+      </default>
+      <site size="0.001" rgba="0.5 0.5 0.5 0.3" group="4"/>
+    </default>
+    
+    <default class="wheel_motor">
+      <motor gear="1" ctrllimited="true" ctrlrange="-100 100" />
+    </default>
+    <default class="wheel_motor_strong">
+      <motor gear="1" ctrllimited="true" ctrlrange="-100 100" />
+    </default>
+  </default>
+
+  <asset>
+    <material name="wheel_material" rgba="0.89804 0.91765 0.92941 1" />
+    <material name="base_material" rgba="0.84706 0.84706 0.84706 1" />
+    <material name="wheel_dark" rgba="0.29804 0.29804 0.29804 1" />
+    <mesh name="base_link" file="base_link.STL"/>
+    <mesh name="LF_Link" file="LF_Link.STL"/>
+    <mesh name="LFP_Link" file="LFP_Link.STL"/>
+    <mesh name="LW_Link" file="LW_Link.STL"/>
+    <mesh name="RF_Link" file="RF_Link.STL"/>
+    <mesh name="RFP_Link" file="RFP_Link.STL"/>
+    <mesh name="RW_Link" file="RW_Link.STL"/>
+  </asset>
+
+  <worldbody>
+    <light mode="targetbodycom" target="base_link" pos="2 0 2.5"/>
+    <body name="base_link" pos='0 0 0.25' childclass="wheel">
+      <inertial pos="-0.00064749 -8.914E-05 0.0086246" quat="1.0 0.0 0.0 0.0" mass="4.5068" diaginertia="0.0050266 0.0054947 0.0061634" />
+      <freejoint/>
+      <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.84706 0.84706 0.84706 1" mesh="base_link" />
+      <geom type="mesh" rgba="0.84706 0.84706 0.84706 1" mesh="base_link" />
+      
+      <body name="imu_link">
+        <inertial pos="0 0 0" mass="0.01" diaginertia="1e-06 1e-06 1e-06"/>
+        <geom size="0.0075 0.0075 0.002" type="box" contype="0" conaffinity="0" group="1" density="0"/>
+        <site name="imu" pos="0 0 0"/>
+      </body>
+
+      <body name="LF_Link" pos="0 0.1325 0" childclass="wheel">
+        <inertial pos="0.089365 -0.00018073 0.0029646" quat="1.0 0.0 0.0 0.0" mass="0.17934" diaginertia="1.9784e-05 7.9217e-05 7.1768e-05" />
+        <joint name="LF_Joint" pos="0 0 0" axis="0 -1 0" range="-1.57 3.14" armature="0.01" damping="0.1" />
+        <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.89804 0.91765 0.92941 1" mesh="LF_Link" />
+        <geom type="mesh" rgba="0.89804 0.91765 0.92941 1" mesh="LF_Link" />
+        
+        <body name="LFP_Link" pos="0.142 0 0" childclass="wheel">
+          <inertial pos="-0.12177 0.0042175 -0.14582" quat="1.0 0.0 0.0 0.0" mass="0.95838" diaginertia="0.00069686 0.0012011 0.00065048" />
+          <joint name="LFP_Joint" pos="0 0 0" axis="0 1 0" range="-1.134 0.314" armature="0.01" damping="0.1" />
+          <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.89804 0.91765 0.92941 1" mesh="LFP_Link" />
+          <geom type="mesh" rgba="0.89804 0.91765 0.92941 1" mesh="LFP_Link" />
+          
+          <body name="LW_Link" pos="-0.142 0 -0.168" childclass="wheel">
+            <inertial pos="-2.5931E-15 0.017841 1.3878E-16" quat="1.0 0.0 0.0 0.0" mass="0.3803" diaginertia="0.00056199 0.0010274 0.00056199" />
+            <joint name="LW_Joint" pos="0 0 0" axis="0 -1 0" range="-999999 999999" armature="0.01" damping="0.1" />
+            <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.29804 0.29804 0.29804 1" mesh="LW_Link"/>
+            <geom type="mesh" rgba="0.29804 0.29804 0.29804 1" mesh="LW_Link" friction="1.5 1.5 0.001" solimp="0.95 0.95 0.01" solref="0.02 1"/>
+          </body>
+        </body>
+      </body>
+
+      <body name="RF_Link" pos="0 -0.1325 0" childclass="wheel">
+        <inertial pos="0.089365 -7.144E-05 0.0029646" quat="1.0 0.0 0.0 0.0" mass="0.17934" diaginertia="1.9784e-05 7.9217e-05 7.1768e-05" />
+        <joint name="RF_Joint" pos="0 0 0" axis="0 -1 0" range="-1.57 3.14" armature="0.01" damping="0.1" />
+        <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.89804 0.91765 0.92941 1" mesh="RF_Link" />
+        <geom type="mesh" rgba="0.89804 0.91765 0.92941 1" mesh="RF_Link" />
+        
+        <body name="RFP_Link" pos="0.142 0 0" childclass="wheel">
+          <inertial pos="-0.12541 -0.0043984 -0.1498" quat="1.0 0.0 0.0 0.0" mass="0.95838" diaginertia="0.00064564 0.0011108 0.00061075" />
+          <joint name="RFP_Joint" pos="0 0 0" axis="0 1 0" range="-1.134 0.314" armature="0.01" damping="0.1" />
+          <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.79608 0.82353 0.93725 1" mesh="RFP_Link" />
+          <geom type="mesh" rgba="0.79608 0.82353 0.93725 1" mesh="RFP_Link" />
+          
+          <body name="RW_Link" pos="-0.142 0 -0.168" childclass="wheel">
+            <inertial pos="5.6319E-15 -0.017841 4.0079E-14" quat="1.0 0.0 0.0 0.0" mass="0.3803" diaginertia="0.00056199 0.0010274 0.00056199" />
+            <joint name="RW_Joint" pos="0 0 0" axis="0 -1 0" range="-99999 99999" armature="0.01" damping="0.1" />
+            <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.29804 0.29804 0.29804 1" mesh="RW_Link"/>
+            <geom type="mesh" rgba="0.29804 0.29804 0.29804 1" mesh="RW_Link" friction="1.5 1.5 0.001" solimp="0.95 0.95 0.01" solref="0.02 1"/>
+          </body>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+
+  <actuator>
+    <motor class="wheel_motor" name="LF_Joint" joint="LF_Joint"/>
+    <motor class="wheel_motor" name="LFP_Joint" joint="LFP_Joint"/>
+    <motor class="wheel_motor_strong" name="LW_Joint" joint="LW_Joint"/>
+    <motor class="wheel_motor" name="RF_Joint" joint="RF_Joint"/>
+    <motor class="wheel_motor" name="RFP_Joint" joint="RFP_Joint"/>
+    <motor class="wheel_motor_strong" name="RW_Joint" joint="RW_Joint"/>
+  </actuator>
+
+  <sensor>
+    <accelerometer name="accel" site="imu"/>
+    <gyro name="gyro" site="imu"/>
+
+    <jointpos name="jpos_LF" joint="LF_Joint" user='13'/>
+    <jointpos name="jpos_LFP" joint="LFP_Joint" user='13'/>
+    <jointpos name="jpos_LW" joint="LW_Joint" user='13'/>
+    <jointpos name="jpos_RF" joint="RF_Joint" user='13'/>
+    <jointpos name="jpos_RFP" joint="RFP_Joint" user='13'/>
+    <jointpos name="jpos_RW" joint="RW_Joint" user='13'/>
+
+    <jointvel name="jvel_LF" joint="LF_Joint" user='13'/>
+    <jointvel name="jvel_LFP" joint="LFP_Joint" user='13'/>
+    <jointvel name="jvel_LW" joint="LW_Joint" user='13'/>
+    <jointvel name="jvel_RF" joint="RF_Joint" user='13'/>
+    <jointvel name="jvel_RFP" joint="RFP_Joint" user='13'/>
+    <jointvel name="jvel_RW" joint="RW_Joint" user='13'/>
+
+    <jointactuatorfrc name="jtor_LF" joint="LF_Joint" user='13' noise='1e-3' />
+    <jointactuatorfrc name="jtor_LFP" joint="LFP_Joint" user='13' noise='1e-3' />
+    <jointactuatorfrc name="jtor_LW" joint="LW_Joint" user='13' noise='1e-3' />
+    <jointactuatorfrc name="jtor_RF" joint="RF_Joint" user='13' noise='1e-3' />
+    <jointactuatorfrc name="jtor_RFP" joint="RFP_Joint" user='13' noise='1e-3' />
+    <jointactuatorfrc name="jtor_RW" joint="RW_Joint" user='13' noise='1e-3' />
+
+    <framequat name="imu_quat" objtype="site" noise='0.001' objname="imu" />
+    <gyro name="imu_gyro" site="imu" noise='0.005' cutoff='34.9'/>
+    <accelerometer name="imu_acc" site="imu" noise='0.005' cutoff='157'/>
+    
+    <framepos name="frame_pos" objtype="site" objname="imu" noise='0.001'/>
+    <framelinvel name="frame_vel" objtype="site" objname="imu" noise='0.001'/>
+  </sensor>
+
+</mujoco>

@@ -102,9 +102,7 @@ class BipedCfgWL(BaseConfig):
         class ranges:
             lin_vel_x = [-1.0, 1.0]  # min max [m/s]
             lin_vel_y = [0, 0]  # min max [m/s]
-            # lin_vel_x = [-1.7, 1.7]  # min max [m/s]
-            # lin_vel_y = [-1.7, 1.7]  # min max [m/s]
-            ang_vel_yaw = [-0.6, 0.6]  # min max [rad/s]
+            ang_vel_yaw = [0.0, 0.0]  # min max [rad/s]
             heading = [-3.14159, 3.14159]
 
     class gait:
@@ -235,20 +233,20 @@ class BipedCfgWL(BaseConfig):
             # regulation related rewards
             nominal_foot_position = 4.0
             leg_symmetry = 0.5 #0.5
-            same_foot_x_position = -10  #-50
+            same_foot_x_position = -50  #-50
             same_foot_z_position = -100
             lin_vel_z = -0.3 
-            ang_vel_xy = -0.2 #-0.3
+            ang_vel_xy = -0.4 #-0.3
             torques = -0.00016
             dof_acc = -1.5e-7
-            action_rate = -0.02 #-0.03
+            action_rate = -0.06 #-0.03
             dof_pos_limits = -2.0
             collision = -50
-            action_smooth = -0.02 #-0.03
+            action_smooth = -0.06 #-0.03
             orientation = -12.0 #-12
             # feet_distance = -100
             base_height = -20 #-20
-            wheel_adjustment = 2 #1
+            #wheel_adjustment = 2 #1
         only_positive_rewards = False  # if true negative total rewards are clipped at zero (avoids early termination problems)
         clip_reward = 100
         clip_single_reward = 5
@@ -268,7 +266,7 @@ class BipedCfgWL(BaseConfig):
         feet_height_target = 0.03
         # min_feet_distance = 0.3
         # max_feet_distance = 0.35
-        max_contact_force = 50.0  # forces above this value are penalized
+        max_contact_force = 100.0  # forces above this value are penalized
         kappa_gait_probs = 0.05
         gait_force_sigma = 25.0
         gait_vel_sigma = 0.25

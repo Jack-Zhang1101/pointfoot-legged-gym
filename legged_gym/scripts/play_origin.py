@@ -98,83 +98,23 @@ def play(args):
     env, _ = task_registry.make_env(name=args.task, args=args, env_cfg=env_cfg)
     # get robot_type
     robot_type = os.getenv("ROBOT_TYPE")
-    commands_val = to_torch([0.5, 0.0, 0, 0], device=env.device) if robot_type.startswith("PF")\
-        else to_torch([1.0, 0.0, 0.0], device=env.device) if robot_type in ["Tita", "WF_TRON1A","WL"]  else to_torch([1.5, 0.0, 0.0, 0.0, 0.0])
-    action_scale = env.cfg.control.action_scale_pos if robot_type in ["Tita", "WF_TRON1A","WL"] \
-        else env.cfg.control.action_scale
+    commands_val = to_torch([1.0, 0.0, 0.0], device=env.device) if robot_type in ["Tita", "WF_TRON1A","WL"]  else to_torch([0.5, 0.0, 0, 0], device=env.device) if robot_type.startswith("PF") else to_torch([1.5, 0.0, 0.0, 0.0, 0.0])
+    action_scale = env.cfg.control.action_scale_pos if robot_type in ["Tita", "WF_TRON1A","WL"] else env.cfg.control.action_scale
     obs, obs_history, commands, _ = env.get_observations()
-    # load policy
-    train_cfg.runner.resume = True
-    train_cfg.runner.load_run = args.load_run
-    train_cfg.runner.checkpoint = args.checkpoint
-    # train_cfg.runner.checkpoint = -1
 
-    ppo_runner, train_cfg = task_registry.make_alg_runner(
-        env=env, name=args.task, args=args, train_cfg=train_cfg
+    # 直接加载 torchscript 导出的合并模型
+    policy_path = os.path.join(
+        LEGGED_GYM_ROOT_DIR,
+        "logs",
+        args.task,
+        train_cfg.runner.experiment_name,
+        "exported",
+        "policies",
+        "combined_policy.pt"
     )
-    policy = ppo_runner.get_inference_policy(device=env.device)
-    encoder = ppo_runner.get_inference_encoder(device=env.device)
-
-    # export policy as a jit module (used to run it from C++)
-    if EXPORT_POLICY:
-        path = os.path.join(
-            LEGGED_GYM_ROOT_DIR,
-            "logs",
-            args.task,
-            train_cfg.runner.experiment_name,
-            "exported",
-            "policies",
-        )
-        export_policy_as_jit(ppo_runner.alg.actor_critic, path)
-        print("Exported policy as jit script to: ", path)
-        export_mlp_as_onnx(
-            ppo_runner.alg.actor_critic.actor,
-            path,
-            "policy",
-            ppo_runner.alg.actor_critic.num_actor_obs,
-        )
-        export_mlp_as_onnx(
-            ppo_runner.alg.encoder,
-            path,
-            "encoder",
-            ppo_runner.alg.encoder.num_input_dim,
-        )
-        
-        # 导出合并的模型
-        print("\n开始导出合并的ONNX模型...")
-        obs_dim = env_cfg.env.num_observations
-        obs_history_steps = env_cfg.env.obs_history_length + 1  # 11步
-        command_dim = env_cfg.commands.num_commands
-        total_dim = obs_dim * obs_history_steps + command_dim  # 245
-        print(f"总输入维度: {total_dim}")
-        encoder_cpu = copy.deepcopy(ppo_runner.alg.encoder).to("cpu")
-        actor_cpu = copy.deepcopy(ppo_runner.alg.actor_critic.actor).to("cpu")
-        combined = CombinedPolicy(encoder_cpu, actor_cpu, obs_dim, obs_history_steps, command_dim)
-        combined.eval()
-        combined_path = os.path.join(path, "combined_policy.onnx")
-        dummy_input = torch.randn(1, total_dim)
-        torch.onnx.export(
-            combined,
-            dummy_input,
-            combined_path,
-            input_names=["input"],
-            output_names=["actions"],
-            opset_version=13,
-            verbose=True,
-            export_params=True,
-        )
-        print("Exported combined policy as onnx script to: ", combined_path)
-        
-        # 导出合并的TorchScript模型
-        print("\n开始导出合并的TorchScript模型...")
-        combined_pt_path = os.path.join(path, "combined_policy.pt")
-        # 先转换为TorchScript模型
-        scripted_model = torch.jit.script(combined)
-        # 保存TorchScript模型
-        torch.jit.save(scripted_model, combined_pt_path)
-        print("Exported combined policy as TorchScript model to: ", combined_pt_path)
-        
-        print("合并模型导出完成！")
+    policy = torch.jit.load(policy_path)
+    policy.eval()
+    print("Loaded combined_policy.pt from:", policy_path)
 
     logger = Logger(env.dt)
     robot_index = 5  # which robot is used for logging
@@ -189,15 +129,22 @@ def play(args):
     img_idx = 0
     est = None
     for i in range(10 * int(env.max_episode_length)):
-        est = encoder(obs_history)
-        actions = policy(torch.cat((est, obs, commands), dim=-1).detach())
+        # 组装 input_tensor
+        print("play.py obs_history:", obs_history[0].cpu().numpy())
+        print("play.py obs:", obs[0].cpu().numpy())
+        print("play.py command:", commands[0].cpu().numpy())
+        input_tensor = torch.cat((obs_history, obs, commands), dim=1)
+        print("play.py input_tensor:", input_tensor[0].cpu().numpy())
+        with torch.no_grad():
+            actions = policy(input_tensor)
+        print("play.py action:", actions[0].cpu().numpy())
 
         env.commands[:, :] = commands_val
 
         obs, rews, dones, infos, obs_history, commands, _ = env.step(
             actions.detach()
         )
-        if RECORD_FRAMES:
+        if False:  # RECORD_FRAMES
             if i % 2:
                 filename = os.path.join(
                     LEGGED_GYM_ROOT_DIR,
@@ -209,7 +156,7 @@ def play(args):
                 )
                 env.gym.write_viewer_image_to_file(env.viewer, filename)
                 img_idx += 1
-        if MOVE_CAMERA:
+        if False:  # MOVE_CAMERA
             camera_offset = np.array(env_cfg.viewer.pos)
             target_position = np.array(
                 env.base_position[robot_index, :].to(device="cpu")
@@ -268,8 +215,5 @@ def play(args):
 
 
 if __name__ == "__main__":
-    EXPORT_POLICY = True
-    RECORD_FRAMES = False
-    MOVE_CAMERA = True
     args = get_args()
     play(args)
